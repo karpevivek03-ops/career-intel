@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Career Intelligence Dashboard</title>
+<meta name="theme-color" content="#070D1F">
+<meta name="description" content="Resume, job match and skill-gap dashboard">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Career Intel">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070D1F;--card:rgba(20,32,64,.55);--solid:#12203F;--ink:#E8EEFF;--mute:#9AA9CF;--line:rgba(140,170,255,.2);--acc:#4FD1C5;--acc2:rgba(79,209,197,.14);--ok:#5EE0A8;--part:#F2C14E;--miss:#FF8A73;--okbg:rgba(94,224,168,.14);--partbg:rgba(242,193,78,.16);--missbg:rgba(255,138,115,.16);--g1:rgba(139,124,255,.3);--g2:rgba(79,209,197,.2);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{--bg:#F3F6FD;--card:rgba(255,255,255,.74);--solid:#fff;--ink:#0E1A3A;--mute:#55638A;--line:#D3DCF0;--acc:#0E7C86;--acc2:#DDF1F2;--ok:#1F7A55;--part:#9A6B0B;--miss:#B4432F;--okbg:#DDF1E6;--partbg:#F6EAC9;--missbg:#F6DDD6;--g1:rgba(139,124,255,.18);--g2:rgba(14,124,134,.14);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:0}h2{font-size:17px;margin:0 0 4px}h3{font-size:14px;margin:0}
+.mute{color:var(--mute);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.grid{display:grid;gap:14px}
+@media(min-width:760px){.g2{grid-template-columns:1fr 1.3fr}.g3{grid-template-columns:repeat(2,1fr)}}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:8px 14px;font-weight:600}
+.btn.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+:root[data-theme="dark"] .btn.p{color:#0E1815}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.p{color:#0E1815}}
+nav{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:14px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font-weight:600;color:var(--mute);white-space:nowrap}
+nav button[aria-selected=true]{color:var(--ink);border-color:var(--acc)}
+.banner{background:var(--partbg);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:12px}
+.bar{display:grid;grid-template-columns:96px 1fr 38px;gap:8px;align-items:center;margin:7px 0;font-size:13px;width:100%;background:none;border:0;padding:0;text-align:left}
+.track{height:9px;background:var(--line);border-radius:6px;overflow:hidden}
+.fill{height:100%;border-radius:6px;background:var(--acc);transition:width .5s}
+.fill.m{background:var(--part)}.fill.l{background:var(--miss)}
+.why{font-size:12.5px;color:var(--mute);margin:-2px 0 6px 104px}
+.job{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.job:hover{border-color:var(--acc)}
+.pct{min-width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--line) 0);position:relative}
+.pct span{position:absolute;inset:5px;border-radius:50%;background:var(--solid);display:grid;place-items:center;font-size:13px}
+.tag{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:20px;background:var(--acc2);margin:2px 4px 0 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:5px 12px;font-size:13px}
+.chip[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+:root[data-theme="dark"] .chip[aria-pressed=true]{color:#0E1815}
+.sk{display:inline-block;padding:3px 10px;border-radius:7px;margin:3px 4px 0 0;font-size:13px}
+.sk.ok{background:var(--okbg);color:var(--ok)}.sk.pt{background:var(--partbg);color:var(--part)}.sk.ms{background:var(--missbg);color:var(--miss)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input[type=search],select{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:8px 10px;flex:1;min-width:140px}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet.on{display:flex}
+.panel{background:var(--bg);width:100%;max-width:680px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+@media(min-width:760px){.sheet{align-items:center}.panel{border-radius:18px}}
+.funnel div{margin:6px auto;padding:10px 14px;border-radius:8px;background:var(--acc);color:#fff;display:flex;justify-content:space-between;font-weight:600}
+:root[data-theme="dark"] .funnel div{color:#0E1815}
+details{border-top:1px solid var(--line);padding:8px 0}summary{cursor:pointer;font-weight:600}
+.up{border:2px dashed var(--line);border-radius:16px;padding:36px 16px;text-align:center;margin:16px 0}
+.steps li{color:var(--mute);margin:4px 0}.steps li.on{color:var(--ink);font-weight:600}
+.hide{display:none}
+body{background:radial-gradient(900px 520px at 12% -8%,var(--g1),transparent 70%),radial-gradient(800px 520px at 100% 6%,var(--g2),transparent 70%),var(--bg);background-attachment:fixed}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap{max-width:1120px;position:relative;z-index:1}
+.card,.job,.hstats div,.up,.chip{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.card{box-shadow:0 10px 40px -24px rgba(0,0,0,.6)}
+.job{transition:box-shadow .2s,border-color .2s}.job:hover{box-shadow:0 0 0 1px var(--acc),0 10px 34px -14px var(--acc)}
+.fill{background:linear-gradient(90deg,var(--acc),#8B7CFF)}
+nav{border:1px solid var(--line);border-radius:14px;padding:4px;gap:2px;background:var(--card);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);top:calc(env(safe-area-inset-top,0px) + 8px)}
+nav button{border:0;border-radius:10px}
+nav button[aria-selected=true]{border:0;background:var(--acc2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--acc)}
+.ht{font-size:clamp(28px,6vw,46px);line-height:1.1;letter-spacing:-.02em;margin:0 0 10px;font-weight:700;background:linear-gradient(90deg,var(--ink) 45%,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero{padding:18px 0 22px}.hero.hide{display:none}.hero p{max-width:560px;color:var(--mute);margin:0 0 14px}
+.hstats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+@media(min-width:760px){.hstats{grid-template-columns:repeat(4,1fr)}}
+.hstats div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.hstats b{display:block;font-size:22px}.hstats span{font-size:12px;color:var(--mute)}
+.up{background:var(--card);border-radius:16px}
+textarea,input[type=email]{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:10px;font:inherit;color:var(--ink)}
+.dots button{width:9px;height:9px;border-radius:50%;border:0;background:var(--line);padding:0;margin:0 3px}
+.dots button.on{background:var(--acc);width:22px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:30}
+#toast.on{opacity:1}
+label.chip{display:inline-flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="wrap">
+
+<section id="upload">
+  <h1 class="ht">Build your resume intelligence</h1>
+  <p class="mute">Upload your resume. We read it, extract skills and experience, then build your dashboard.</p>
+  <div class="up">
+    <p><b>Drag &amp; drop your resume</b><br><span class="mute">PDF · DOC · DOCX · HTML</span></p>
+    <div class="row" style="justify-content:center">
+      <button class="btn" onclick="go()">Browse files</button>
+      <button class="btn p" onclick="go()">Analyze with sample resume</button>
+    </div>
+  </div>
+  <ol class="steps" id="steps"><li>Uploading</li><li>Reading document</li><li>Extracting information</li><li>Analyzing resume</li><li>Creating resume profile</li><li>Building dashboard</li></ol>
+</section>
+
+<section id="app" class="hide">
+  <div class="top">
+    <div><h1>Hi Vivek</h1><div class="mute">QA Engineer · Resume A (Technical Documentation + QA)</div></div>
+    <div class="row" style="align-items:center"><span class="mute" id="svn"></span><a class="btn p" href="live.html" style="text-decoration:none">Live AI</a><button class="btn" id="inst">Install app</button><button class="btn" id="theme" aria-label="Toggle theme">Theme</button></div>
+  </div>
+  <div class="hero"><h2 class="ht">Your career, mapped as a graph</h2><p>Skills, companies and gaps connect here. Follow the links to see where you fit and what opens up next.</p><div class="row"><button class="btn p" onclick="setTab('Platforms')">See matched companies</button><button class="btn" onclick="setTab('Jobs')">Check a job description</button></div><div class="hstats" id="hs"></div></div>
+  <section class="card" id="news" style="margin-bottom:14px"></section>
+  <div class="banner">Prototype with sample data. Scores are model estimates, not exact measurements. Job and funnel numbers are placeholders until real sources are connected.</div>
+  <nav role="tablist" id="tabs"></nav>
+  <main id="view"></main>
+</section>
+</div>
+
+<div id="toast" role="status"></div>
+<div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},st=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const DIM={s:'Skills',e:'Experience',d:'Education',r:'Responsibilities',k:'Keywords',i:'Industry'};
+let W={s:30,e:20,d:5,r:20,k:10,i:15};
+const J=[
+{id:1,co:'Meridian ERP Systems',t:'QA Engineer',loc:'Thane',b:{s:91,e:90,d:100,r:88,k:84,i:92},ok:['Manual Testing','API Testing','ERP','Documentation','Jira'],pt:['SQL','Agile'],ms:['Selenium'],tags:['New']},
+{id:2,co:'Northwind Docs',t:'Technical Writer',loc:'Mumbai',b:{s:88,e:92,d:100,r:86,k:80,i:85},ok:['Technical Writing','Documentation','Jira'],pt:['API Docs','Agile'],ms:['Markdown','Docs-as-code'],tags:[]},
+{id:3,co:'Apex Auto Components',t:'QA Analyst',loc:'Pune',b:{s:84,e:88,d:100,r:82,k:78,i:90},ok:['Manual Testing','Test Cases','Jira','Automotive'],pt:['SQL','Agile'],ms:[],tags:[]},
+{id:4,co:'Vertex Chemicals Digital',t:'Digital Documentation Analyst',loc:'Navi Mumbai',b:{s:72,e:78,d:100,r:70,k:66,i:95},ok:['Chemical Domain','Documentation','ERP'],pt:['SQL'],ms:['Data Analysis'],tags:['Skill opportunity']},
+{id:5,co:'Lumen AI Labs',t:'AI Documentation Specialist',loc:'Remote',b:{s:64,e:70,d:100,r:68,k:62,i:70},ok:['Technical Writing','Documentation'],pt:['LLM','Prompt Engineering'],ms:['Python'],tags:['New','Skill opportunity']},
+{id:6,co:'Pioneer SaaS',t:'QA Automation Engineer',loc:'Pune',b:{s:58,e:66,d:100,r:60,k:55,i:72},ok:['API Testing','Jira','Manual Testing'],pt:[],ms:['Selenium','Python','CI/CD'],tags:['Skill opportunity','Closing soon'],dl:'14 Oct 2026'},
+{id:7,co:'Orbit Fintech',t:'Business Analyst',loc:'Mumbai',b:{s:70,e:72,d:100,r:74,k:68,i:55},ok:['Documentation','Jira'],pt:['SQL','Agile','Requirements'],ms:[],tags:[]}];
+const LEARN={Selenium:'Automate 3 flows on a demo site with Selenium + pytest',Python:'Python basics, then pytest and file handling',Markdown:'Write one doc set in Markdown on GitHub','Docs-as-code':'Publish docs with Git and a static site generator','Data Analysis':'SQL aggregates, then pandas basics','CI/CD':'Run tests on GitHub Actions',SQL:'Practise joins and aggregates on real queries',Agile:'Add sprint and Jira workflow evidence to your resume',LLM:'Build a small LLM API script',Requirements:'Document requirements for a past project','Prompt Engineering':'Write and test prompts with structured outputs','API Docs':'Document a public REST API with OpenAPI'};
+const SRC={1:['Naukri','LinkedIn','Company site'],2:['LinkedIn','Indeed'],3:['Naukri','Foundit'],4:['Company site','LinkedIn'],5:['LinkedIn','Glassdoor'],6:['Indeed','Naukri','Foundit'],7:['Glassdoor','Indeed']};
+const score=j=>{const t=Object.values(W).reduce((a,b)=>a+b,0)||1;return Math.round(Object.keys(W).reduce((a,k)=>a+W[k]*j.b[k],0)/t)};
+const RH=[['Skills',86,'12 skills found, 9 backed by project evidence'],['Experience',80,'Roles are clear; few measurable outcomes'],['Education',90,'Degree and field present'],['Keywords',74,'Few automation and tooling terms'],['Structure',88,'Clean sections, consistent dates'],['Completeness',78,'Missing LinkedIn URL and certifications']];
+const PATHS=[
+['AI-assisted Technical Documentation',72,['Technical Writer','AI Documentation Specialist'],['Python','LLM','Prompt Engineering'],'Docs, LLM APIs, Markdown'],
+['Business / Technical Analyst',66,['Business Analyst','Systems Analyst'],['SQL','Requirements','Data Analysis'],'SQL, Jira, BI tools'],
+['Chemical Industry Digital Roles',60,['Digital Documentation Analyst','ERP Analyst'],['Data Analysis','SQL'],'ERP, data platforms'],
+['Software QA / Testing',78,['QA Engineer','QA Analyst','QA Automation Engineer'],['Selenium','Python','CI/CD'],'Selenium, pytest, Postman']];
+const TABS=['Overview','Jobs','Platforms','Skills','Careers','Funnel'];let tab='Overview',filter='All',q='',sort='match',pf='All',U={},SV=new Set(ld('sv',[]));
+
+const bar=(l,v,why,id)=>`<button class="bar" ${why?`onclick="tg('${id}')"`:'disabled'} aria-expanded="false"><span>${l}</span><span class="track"><span class="fill ${v<65?'l':v<80?'m':''}" style="display:block;width:${v}%"></span></span><b>${v}</b></button>${why?`<div class="why hide" id="w${id}">${why}</div>`:''}`;
+const tg=i=>$('#w'+i).classList.toggle('hide');
+const chips=(a,c)=>a.map(x=>`<span class="sk ${c}">${c=='ok'?'✓':c=='pt'?'~':'✗'} ${x}</span>`).join('');
+const ring=v=>`<svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="Resume health ${v} out of 100"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="11"/><circle cx="60" cy="60" r="52" fill="none" stroke="var(--acc)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${3.267*v} 400" transform="rotate(-90 60 60)"/><text x="60" y="62" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)">${v}</text><text x="60" y="80" text-anchor="middle" font-size="11" fill="var(--mute)">out of 100</text></svg>`;
+const jobCard=j=>{const s=score(j);return `<button class="job" onclick="openJob(${j.id})"><div class="pct" style="--p:${s}"><span>${s}%</span></div><div style="flex:1"><b>${j.t}</b><div class="mute">${j.co} · ${j.loc}${j.dl?' · closes '+j.dl:''}</div><div>${s>=85?'<span class="tag">Strong match</span>':''}${j.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div></button>`};
+
+function projScore(j,A){const g=[...j.ms,...j.pt],f=g.length?g.filter(x=>A.has(x)).length/g.length:0,b=j.b;return score({b:{...b,s:b.s+(100-b.s)*f*.8,k:b.k+(100-b.k)*f*.6,r:b.r+(100-b.r)*f*.4}})}
+function whatif(id){const j=J.find(x=>x.id==id),A=U[id]||(U[id]=new Set()),g=[...j.ms,...j.pt],p=projScore(j,A),o=J.filter(x=>x.id!=id&&[...x.ms,...x.pt].some(k=>A.has(k))).map(x=>`<li>${x.t}, ${x.co}: ${score(x)}% → <b>${projScore(x,A)}%</b></li>`).join('');
+return `<h3>What if you learn…</h3><p class="mute">Tick skills to see the projected match and which other roles open up. Estimates only.</p><div class="row">${g.map(k=>`<label class="chip"><input type="checkbox" ${A.has(k)?'checked':''} onchange="tgl(${id},'${k}')"> ${k}</label>`).join('')||'<span class="mute">No gaps in this sample.</span>'}</div><p style="font-size:18px;margin:10px 0 4px"><b>${score(j)}% → ${p}%</b></p><div class="track"><span class="fill" style="display:block;width:${p}%"></span></div>${o?`<p class="mute" style="margin:10px 0 2px">Also improves:</p><ul>${o}</ul>`:''}`}
+function tgl(id,k){const A=U[id];A.has(k)?A.delete(k):A.add(k);$('#wi').innerHTML=whatif(id)}
+function letter(j,tone){const g=[...j.pt,...j.ms],k=j.ok.slice(0,3).join(', '),dom=j.ok.includes('Chemical Domain')?' My background in the chemical domain also gives me useful context for your industry.':'',gap=g.length?` I am currently strengthening ${g.slice(0,3).join(', ')} and ramp up quickly on new tools.`:'';
+const open={Professional:`I am writing to apply for the ${j.t} position at ${j.co}.`,Concise:`I would like to apply for the ${j.t} role at ${j.co}.`,Warm:`I was excited to see the ${j.t} opening at ${j.co} and would love to be considered.`}[tone];
+const mid=tone=='Concise'?`In my current role as a QA Engineer at Technosoft Engineering Project Ltd, I work with ${k}.`:`In my current role as a QA Engineer at Technosoft Engineering Project Ltd in Thane, I work daily with ${k}, which map directly to what you are looking for. My work combines testing with clear technical documentation, so issues and processes are easy for teams to follow.`;
+return `Dear Hiring Manager,\n\n${open} ${mid}${dom}${gap}\n\nI would welcome the chance to discuss how I can contribute to ${j.co}. Thank you for your time.\n\nSincerely,\nVivek`}
+function genLetter(id){$('#ctx').value=letter(J.find(x=>x.id==id),$('#tone').value)}
+async function copyL(){const t=$('#ctx');try{await navigator.clipboard.writeText(t.value)}catch(e){t.select();document.execCommand('copy')}toast('Cover letter copied')}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)}
+function sv(id){SV.has(id)?SV.delete(id):SV.add(id);st('sv',[...SV]);$('#svb').textContent=SV.has(id)?'Saved ✓':'Save job';$('#svn').textContent=SV.size?SV.size+' saved':''}
+let JD='',JDR='';
+const jdTool=()=>`<div class="card"><h2>Check any job description</h2><p class="mute">Paste a job description from any platform to see how your resume fits.</p><textarea id="jd" rows="4" placeholder="Paste job description" oninput="JD=this.value" style="width:100%">${JD.replace(/</g,'&lt;')}</textarea><div class="row" style="margin-top:8px"><button class="btn p" onclick="runJD()">Check fit</button></div><div id="jdo">${JDR}</div></div>`;
+function runJD(){const all=new Set(),have=new Set(),part=new Set();J.forEach(j=>{j.ok.forEach(x=>{all.add(x);have.add(x)});j.pt.forEach(x=>{all.add(x);part.add(x)});j.ms.forEach(x=>all.add(x))});
+const t=JD.toLowerCase(),f=[...all].filter(x=>t.includes(x.toLowerCase())),o=f.filter(x=>have.has(x)),p=f.filter(x=>!have.has(x)&&part.has(x)),m=f.filter(x=>!have.has(x)&&!part.has(x));
+JDR=f.length?`<p><b>${Math.round((o.length+p.length/2)/f.length*100)}% skill fit</b> <span class="mute">from ${f.length} known skills found</span></p>${chips(o,'ok')}${chips(p,'pt')}${chips(m,'ms')}`:'<p class="mute">No known skills found. Paste a longer description.</p>';$('#jdo').innerHTML=JDR}
+const NS=[['AI','Agentic AI moves into real workflows','Teams are shifting from chatbots to agents that call tools, follow multi-step plans and ask for human approval. Employers now ask for people who can build and test them.',['Tool calling','LangGraph','Python','Evaluation'],'AI'],
+['AI','RAG becomes the default for company knowledge','Retrieval-augmented generation grounds LLM answers in internal documents, which cuts made-up answers. Search over docs and tickets is a common first project.',['Embeddings','pgvector','Chunking','Prompting'],'AI'],
+['Testing','AI-assisted QA and test automation','LLMs now draft test cases and help maintain scripts, while Selenium and Playwright stay the core of automation. QA roles increasingly mix both.',['Selenium','Playwright','Python','CI/CD'],'QA'],
+['Docs','Docs-as-code and AI-assisted documentation','Documentation lives in Git, is written in Markdown or OpenAPI and is drafted with AI, then reviewed by people. Technical writers who know the tooling stand out.',['Markdown','Git','OpenAPI','LLM drafting'],'Documentation'],
+['Trust','Evaluation, security and AI governance','As AI reaches production, companies test outputs, guard against prompt injection and track cost and quality. Testing skills transfer well here.',['Evals','Guardrails','Security','Monitoring'],'AI'],
+['Industry','Digital transformation in chemicals and manufacturing','Plants are connecting ERP, sensor and quality data for analytics and predictive maintenance. Domain knowledge plus data skills is a scarce mix.',['ERP','SQL','Data analysis','Automation'],'Chemical']];
+let ni=0;
+function news(){$('#news').innerHTML=`<h2>Tech trends newsletter</h2><p class="mute">What is trending in the industry. Editorial snapshot for Oct 2026, not live market data. Swipe or use the arrows.</p><div style="overflow:hidden" id="nw"><div id="ntr" style="display:flex;transition:transform .35s;transform:translateX(0)">${NS.map(x=>`<div style="min-width:100%;padding:2px"><div class="card" style="background:var(--acc2);min-height:210px"><span class="tag">${x[0]}</span><h3 style="margin-top:6px;font-size:17px">${x[1]}</h3><p>${x[2]}</p><p class="mute" style="margin:6px 0 2px">Skills in demand</p><div>${x[3].map(k=>`<span class="tag">${k}</span>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn" onclick="q='${x[4]}';setTab('Jobs')">See related jobs</button></div></div></div>`).join('')}</div></div>
+<div class="row" style="justify-content:space-between;align-items:center;margin:10px 0"><button class="btn" onclick="nv(-1)" aria-label="Previous tip">Prev</button><span class="dots">${NS.map((x,i)=>`<button onclick="nv(0,${i})" aria-label="Tip ${i+1}"></button>`).join('')}</span><button class="btn" onclick="nv(1)" aria-label="Next tip">Next</button></div>
+<div class="row"><input type="email" id="em" placeholder="Email for the weekly trends digest" aria-label="Email" style="flex:1;min-width:160px"><button class="btn p" onclick="sub()">Subscribe</button></div><p class="mute" id="nm"></p>`;
+let x0=0;const w=$('#nw');w.ontouchstart=e=>x0=e.touches[0].clientX;w.ontouchend=e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)nv(d<0?1:-1)};nv(0,0)}
+function nv(d,i){ni=i!=null?i:(ni+d+NS.length)%NS.length;$('#ntr').style.transform=`translateX(-${ni*100}%)`;document.querySelectorAll('.dots button').forEach((b,k)=>b.className=k==ni?'on':'')}
+function sub(){const e=$('#em').value;$('#nm').textContent=/^\S+@\S+\.\S+$/.test(e)?'Subscribed. This is a prototype, so nothing was sent.':'Enter a valid email address.'}
+function openJob(id,f){const j=J.find(x=>x.id==id),s=score(j);
+$('#panel').innerHTML=`<div class="top"><div><h2>${j.t}</h2><div class="mute">${j.co} · ${j.loc}</div></div><button class="btn" onclick="closeSheet()">Close</button></div>
+<div class="card"><h3>Overall match ${s}%</h3><p class="mute">Weighted average of six dimensions. Weights are configurable on the Jobs tab.</p>${Object.keys(DIM).map(k=>bar(DIM[k]+' ('+W[k]+'%)',j.b[k])).join('')}</div>
+<div class="card" style="margin-top:12px"><h3>Why this score</h3><p style="margin:8px 0 2px"><b>Matched</b></p>${chips(j.ok,'ok')||'<span class="mute">None</span>'}<p style="margin:10px 0 2px"><b>Partial</b> <span class="mute">needs stronger evidence</span></p>${chips(j.pt,'pt')||'<span class="mute">None</span>'}<p style="margin:10px 0 2px"><b>Missing</b></p>${chips(j.ms,'ms')||'<span class="mute">None</span>'}</div>
+<div class="card" style="margin-top:12px"><h3>Skills that could help alignment</h3><ol>${[...j.ms,...j.pt].map(s=>`<li><b>${s}</b>: ${LEARN[s]||'Add concrete evidence'}</li>`).join('')||'<li>No gaps in this sample.</li>'}</ol><p class="mute">Learning a skill does not guarantee a job offer.</p></div>
+<div class="card" id="wi" style="margin-top:12px">${whatif(j.id)}</div>
+<div class="card" id="cl" style="margin-top:12px"><h3>Cover letter</h3><p class="mute">Built from the skills your resume matches for this job. Edit before you send.</p><div class="row"><select id="tone" onchange="genLetter(${j.id})" aria-label="Tone"><option>Professional</option><option>Concise</option><option>Warm</option></select></div><textarea id="ctx" rows="11" style="width:100%;margin-top:8px"></textarea><div class="row" style="margin-top:8px"><button class="btn p" onclick="copyL()">Copy letter</button><button class="btn" onclick="genLetter(${j.id})">Reset</button></div></div>
+<div class="row" style="margin-top:12px"><button class="btn p" id="svb" onclick="sv(${j.id})">${SV.has(j.id)?'Saved ✓':'Save job'}</button></div>`;
+$('#sheet').classList.add('on');genLetter(j.id);if(f)$('#'+f).scrollIntoView()}
+function closeSheet(){$('#sheet').classList.remove('on')}
+document.addEventListener('keydown',e=>{if(e.key=='Escape')closeSheet()});
+
+function skillStats(){const m={},n=J.length;J.forEach(j=>[...j.ok,...j.pt,...j.ms].forEach(s=>m[s]=(m[s]||0)+1));return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([s,c])=>({s,p:Math.round(c/n*100),have:J.every(j=>!j.ms.includes(s)&&!j.pt.includes(s))||J.some(j=>j.ok.includes(s))&&!J.some(j=>j.ms.includes(s))}))}
+
+const V={
+Overview(){const top=[...J].sort((a,b)=>score(b)-score(a)).slice(0,3);
+return `<div class="grid g2"><div class="card"><h2>Resume health</h2><p class="mute">Tap a row to see why.</p><div style="text-align:center">${ring(Math.round(RH.reduce((a,r)=>a+r[1],0)/RH.length))}</div>${RH.map((r,i)=>bar(r[0],r[1],r[2],'h'+i)).join('')}</div>
+<div><div class="card"><h2>Top job matches</h2><p class="mute">Tap a job to see the breakdown.</p>${top.map(jobCard).join('')}<button class="btn" onclick="setTab('Jobs')">See all jobs</button></div>
+<div class="card" style="margin-top:14px"><h2>Opportunity radar</h2><p class="mute">Think about what to prepare for, not just what to apply to today.</p>
+<p><b>Skill opportunity:</b> ${J.filter(j=>j.tags.includes('Skill opportunity')).length} roles within reach with a manageable gap</p>
+<p><b>Emerging skill:</b> Selenium appears in ${Math.round(J.filter(j=>[...j.ms,...j.ok,...j.pt].includes('Selenium')).length/J.length*100)}% of this sample</p>
+<p><b>Closing soon:</b> Pioneer SaaS closes 14 Oct 2026</p></div></div></div>`},
+Jobs(){let l=J.filter(j=>(filter=='All'||(filter=='Strong match'?score(j)>=85:j.tags.includes(filter)))&&(j.t+j.co).toLowerCase().includes(q.toLowerCase()));
+l.sort((a,b)=>sort=='match'?score(b)-score(a):a.co.localeCompare(b.co));
+return `${jdTool()}<div class="card" style="margin-top:14px"><div class="row"><input type="search" id="q" placeholder="Search title or company" value="${q}" aria-label="Search jobs"><select id="so" aria-label="Sort"><option value="match" ${sort=='match'?'selected':''}>Sort: best match</option><option value="co" ${sort=='co'?'selected':''}>Sort: company</option></select></div>
+<div class="chips">${['All','Strong match','New','Skill opportunity','Closing soon'].map(c=>`<button class="chip" aria-pressed="${filter==c}" onclick="filter='${c}';render()">${c}</button>`).join('')}</div>
+${l.map(jobCard).join('')||'<p class="mute">No jobs match. Clear a filter or search term.</p>'}
+<details><summary>Scoring weights (configurable)</summary><p class="mute">Move a slider and every score updates.</p>${Object.keys(DIM).map(k=>`<label class="bar" style="grid-template-columns:110px 1fr 38px"><span>${DIM[k]}</span><input type="range" min="0" max="50" value="${W[k]}" oninput="W['${k}']=+this.value;render(true)"><b>${W[k]}</b></label>`).join('')}</details></div>`},
+Platforms(){const P=['All','Naukri','LinkedIn','Indeed','Foundit','Glassdoor','Company site'],l=J.filter(j=>pf=='All'||SRC[j.id].includes(pf)).sort((a,b)=>score(b)-score(a));
+return `<div class="card"><h2>Matches by job platform</h2><div class="banner">Sample listings. Real feeds will use official APIs, authorised partners or company career pages, never scraping.</div><div class="chips">${P.map(p=>`<button class="chip" aria-pressed="${pf==p}" onclick="pf='${p}';render()">${p} ${p=='All'?J.length:J.filter(j=>SRC[j.id].includes(p)).length}</button>`).join('')}</div>
+${l.map(j=>{const g=[...j.ms,...j.pt];return `<div class="card" style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><div><b>${j.co}</b><div class="mute">${j.t} · ${j.loc}</div></div><b>${score(j)}%</b></div><div>${SRC[j.id].map(x=>`<span class="tag">${x}</span>`).join('')}</div>${g.length?`<p class="mute" style="margin:8px 0 2px">Upgrade for this company: ${g.slice(0,4).join(', ')}. Closing all gaps could lift the match to about ${projScore(j,new Set(g))}%.</p>`:'<p class="mute">No skill gaps in this sample.</p>'}<div class="row" style="margin-top:8px"><button class="btn" onclick="openJob(${j.id},'wi')">Upgrade plan</button><button class="btn p" onclick="openJob(${j.id},'cl')">Cover letter</button></div></div>`}).join('')||'<p class="mute">No companies on this platform.</p>'}</div>`},
+Skills(){const st=skillStats().slice(0,10);
+return `<div class="card"><h2>Skill demand in this dataset</h2><p class="mute">Dataset: ${J.length} sample jobs · QA, documentation and analyst roles · Maharashtra + remote · Sep 2026. Too small to represent the whole market.</p>
+${st.map(x=>bar(x.s,x.p)).join('')}</div>
+<div class="card" style="margin-top:14px"><h2>What to learn next</h2><p class="mute">Ordered by how many sample jobs list the skill as missing or partial.</p><ol>${Object.entries(J.reduce((m,j)=>{[...j.ms,...j.pt].forEach(s=>m[s]=(m[s]||0)+1);return m},{})).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([s,c])=>`<li><b>${s}</b> (${c} of ${J.length} jobs): ${LEARN[s]}</li>`).join('')}</ol></div>`},
+Careers(){return `<p class="mute">Pathways are shown side by side, not ranked. Alignment is a rough estimate.</p><div class="grid g3">${PATHS.map(p=>`<div class="card"><h2>${p[0]}</h2><div class="bar" style="grid-template-columns:70px 1fr 38px;margin:4px 0 8px"><span>Alignment</span><span class="track"><span class="fill" style="display:block;width:${p[1]}%"></span></span><b>${p[1]}</b></div><p class="mute" style="margin:4px 0">Example titles</p>${p[2].map(t=>`<span class="tag">${t}</span>`).join('')}<p class="mute" style="margin:10px 0 2px">Skills to build</p>${chips(p[3],'ms')}<p class="mute" style="margin:10px 0 0">Technologies: ${p[4]}</p></div>`).join('')}</div>`},
+Funnel(){const f=[['Resume views',247],['Applications',42],['Recruiter responses',8],['Interviews',3],['Offers',0]];
+return `<div class="card"><h2>Job search funnel</h2><div class="banner">Sample numbers. Real values will come only from official APIs, authorised integrations or data you enter.</div><div class="funnel">${f.map((x,i)=>`<div style="width:${100-i*14}%"><span>${x[0]}</span><span>${x[1]}</span></div>`).join('')}</div>
+<p class="mute">Response rate ${Math.round(8/42*100)}% · Interview rate ${Math.round(3/42*100)}% of applications</p></div>
+<div class="card" style="margin-top:14px"><h2>Application tracker</h2><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="text-align:left"><th>Company</th><th>Role</th><th>Status</th></tr><tr><td>Meridian ERP</td><td>QA Engineer</td><td>Interview</td></tr><tr><td>Northwind Docs</td><td>Tech Writer</td><td>Applied</td></tr><tr><td>Pioneer SaaS</td><td>QA Automation</td><td>Saved</td></tr></table></div>`}};
+
+function render(keep){$('#tabs').innerHTML=TABS.map(t=>`<button role="tab" aria-selected="${t==tab}" onclick="setTab('${t}')">${t}</button>`).join('');
+const y=scrollY;$('#view').innerHTML=V[tab]();
+const qi=$('#q');if(qi){qi.oninput=e=>{q=e.target.value;render(true);const n=$('#q');n.focus();n.setSelectionRange(q.length,q.length)}}
+const so=$('#so');if(so)so.onchange=e=>{sort=e.target.value;render()};
+const gp={};J.forEach(j=>j.ms.forEach(k=>gp[k]=(gp[k]||0)+1));const tg=Object.entries(gp).sort((a,b)=>b[1]-a[1])[0];
+$('#hs').innerHTML=[[J.filter(j=>score(j)>=85).length,'strong matches'],[Math.max(...J.map(score))+'%','best match'],[tg?tg[0]:'None','most common gap'],[J.length,'companies, 6 platforms']].map(a=>`<div><b>${a[0]}</b><span>${a[1]}</span></div>`).join('');$('.hero').classList.toggle('hide',tab!='Overview');$('#news').classList.toggle('hide',tab!='Overview');
+$('#svn').textContent=SV.size?SV.size+' saved':'';
+if(keep)scrollTo(0,y);if(!$("#ntr"))news()}
+function setTab(t){tab=t;render();scrollTo(0,0)}
+function go(){const li=[...document.querySelectorAll('#steps li')];let i=0;const t=setInterval(()=>{li.forEach((x,k)=>x.className=k<=i?'on':'');if(++i>=li.length){clearInterval(t);setTimeout(()=>{$('#upload').classList.add('hide');$('#app').classList.remove('hide');st('ready',true);render()},500)}},450)}
+document.documentElement.dataset.theme=ld('th','dark');
+$('#theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme=='dark'?'light':'dark';st('th',r.dataset.theme);bgTheme()};
+(function(){const c=$('#bg'),x=c.getContext('2d'),LB=['Python','SQL','Selenium','Jira','API Testing','ERP','LLM','RAG','Docs','Agile'],P=['#4FD1C5','#8B7CFF','#FF9F5A'],still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let w,h,N=[],m={x:-999,y:-999},dpr=Math.min(devicePixelRatio||1,2),ink,ln,raf;
+window.bgTheme=()=>{const d=document.documentElement.dataset.theme!='light';ink=d?'232,238,255':'14,26,58';ln=d?'140,170,255':'40,70,140';still&&draw(false)};
+function size(){w=innerWidth;h=innerHeight;c.width=w*dpr;c.height=h*dpr;x.setTransform(dpr,0,0,dpr,0,0);const n=Math.round(Math.min(75,Math.max(28,w*h/15000)));N=Array.from({length:n},(_,i)=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:i<LB.length?6+Math.random()*3:1.8+Math.random()*2.4,l:i<LB.length?LB[i]:'',c:i%3}));draw(false)}
+function draw(step){x.clearRect(0,0,w,h);
+if(step)for(const a of N){a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>w)a.vx*=-1;if(a.y<0||a.y>h)a.vy*=-1;const dx=a.x-m.x,dy=a.y-m.y;if(dx*dx+dy*dy<14000){a.x+=dx*.004;a.y+=dy*.004}}
+x.lineWidth=1;
+for(let i=0;i<N.length;i++){const a=N[i];for(let j=i+1;j<N.length;j++){const b=N[j],d=Math.hypot(a.x-b.x,a.y-b.y);if(d<150){x.strokeStyle=`rgba(${ln},${(1-d/150)*.32})`;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}
+const d=Math.hypot(a.x-m.x,a.y-m.y);if(d<190){x.strokeStyle=`rgba(79,209,197,${(1-d/190)*.7})`;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(m.x,m.y);x.stroke()}}
+for(const a of N){x.shadowBlur=a.l?16:0;x.shadowColor=P[a.c];x.fillStyle=P[a.c];x.globalAlpha=a.l?.95:.7;x.beginPath();x.arc(a.x,a.y,a.r,0,7);x.fill();x.shadowBlur=0;if(a.l){x.globalAlpha=.6;x.fillStyle=`rgb(${ink})`;x.font='11px "Schibsted Grotesk",system-ui,sans-serif';x.fillText(a.l,a.x+a.r+5,a.y+4)}}x.globalAlpha=1}
+const loop=()=>{draw(true);raf=requestAnimationFrame(loop)};
+const run=()=>{cancelAnimationFrame(raf);if(!still&&!document.hidden)loop()};
+addEventListener('resize',()=>{size();run()});
+addEventListener('pointermove',e=>{m.x=e.clientX;m.y=e.clientY});
+addEventListener('pointerleave',()=>{m.x=m.y=-999});
+document.addEventListener('visibilitychange',run);
+bgTheme();size();run()})();
+
+let dp=null;const inst=$('#inst');
+if(matchMedia('(display-mode:standalone)').matches||navigator.standalone)inst.classList.add('hide');
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e});
+addEventListener('appinstalled',()=>inst.classList.add('hide'));
+inst.onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null}else toast('iPhone: tap Share, then Add to Home Screen. Android: browser menu, then Install app.')};
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(ld('ready',false)){$('#upload').classList.add('hide');$('#app').classList.remove('hide');render()}
+</script>
+</body>
+</html>
